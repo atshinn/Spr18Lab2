@@ -37,11 +37,6 @@ public abstract class AbstractAction {
 		}		
 	}
 	
-	protected AbstractAction() {
-		
-	}
-
-	
 	abstract public String doAction(); 
 	
 	abstract protected void parseReq() throws InvalidRequestErr;

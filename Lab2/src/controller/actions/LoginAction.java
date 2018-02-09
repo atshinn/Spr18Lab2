@@ -7,16 +7,12 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginAction extends AbstractAction {
 	private String userName,password,prevUser,prevPass;
 	
-	public LoginAction() {
-		super();
+	public LoginAction(HttpServletRequest req,HttpServletResponse res) {
+		super(req,res);
 		this.prevUser="";
 		this.prevPass ="";
 		this.userName = "";
 		this.password = "";
-	}
-	
-	public LoginAction(HttpServletRequest req,HttpServletResponse res) {
-		super(req,res);
 	}
 
 	@Override
