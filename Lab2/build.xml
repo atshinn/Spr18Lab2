@@ -1,0 +1,117 @@
+<project name="${app.name}" default = "compile" basedir=".">
+    <property file="build.properties"/>
+
+	<target name="init">
+	    <tstamp/>
+	    <mkdir dir="${classes.dir}"/>
+	  </target>
+	
+	<!-- Compiles your java files and puts the classes in classes.dir -->
+	  <target name="compile" depends="init">
+	    <javac debug="true"
+	      srcdir="${src.dir}"
+	      destdir="${classes.dir}">
+	      <!-- Make sure you set your classpath! -->
+	      <classpath>
+	        <fileset dir="${tomcat.lib}" includes="servlet-api.jar"/>
+	        <pathelement path="${classes.dir}" />
+	      </classpath>
+	    </javac>
+	  </target>
+
+    <target name="deploy" depends="dist">
+        <antcall target="deploy-port1"/>
+        <antcall target="deploy-port2"/>
+		
+    </target>
+
+    <target name="deploy-port1" depends="dist">
+        <antcall target="__deploy">
+            <param name="port" value="${tomcat.port1}"/>
+        </antcall>
+    </target>
+
+    <target name="deploy-port2" depends="dist">
+        <antcall target="__deploy">
+            <param name="port" value="${tomcat.port2}"/>
+        </antcall>
+    </target>
+
+    <target name="__deploy" depends="dist">
+        <echo message="Deploying to tomcat at ${tomcat.dir}-${port}"/>
+        <copy file="${dist.jar1}" todir="${tomcat.dir}-${port}\webapps\" overwrite="yes"/>
+		<copy file="${dist.jar2}" todir="${tomcat.dir}-${port}\webapps\" overwrite="yes"/>
+    </target>
+
+
+    <target name="build" depends="compile">
+        <mkdir dir="${build.home}"/>
+        <mkdir dir="${build.home}\task1\WEB-INF"/>
+		<mkdir dir="${build.home}\task2\WEB-INF"/>
+        
+		<copy todir="${build.home}\task1\WEB-INF">
+            <fileset dir="." includes="${classes.dir}\**,${lib.dir}\**" excludes="${classes.dir}\driver\**"/>
+        </copy>
+		<copy todir="${build.home}\task2\WEB-INF">
+            <fileset dir="." includes="${classes.dir}\**,${lib.dir}\**" excludes="${classes.dir}\driver\**"/>
+        </copy>
+		
+		<copy todir="${build.home}\task1">
+			<fileset dir="${resources.dir}" excludes="**/*.txt,**/*.ser"/>
+		</copy>
+		<copy todir="${build.home}\task2">
+			<fileset dir="${resources.dir}" excludes="**/*.txt,**/*.ser"/>
+		</copy>
+        <copy file="${properties.dir}\task1\web.xml" todir="${build.home}\task1\WEB-INF">
+         </copy>
+		<copy file="${properties.dir}\task2\web.xml" todir="${build.home}\task2\WEB-INF">
+         </copy>
+        		
+        
+		
+    </target>
+
+    <target name="dist" depends="build">
+        <jar destfile="${dist.jar1}" basedir="${build.home}\task1">
+        </jar>
+		<jar destfile="${dist.jar2}" basedir="${build.home}\task2">
+        </jar>
+    </target>
+
+    <target name="submit" depends="dist,javadoc">
+        <jar destfile="${submit.jar}" basedir="." includes="README.txt,build.properties,build.xml,${src.dir}/**,${docs.dir}/**,${javadoc.dir}/**,${properties.dir}/**,${lib.dir}/**,${classes.dir}/**">
+        </jar>
+    </target>
+
+    <target name="javadoc" depends="init">
+        <javadoc packagenames="*"
+                sourcepath="src/java"
+                destdir="javadoc"
+                author="true"
+                version="true"
+                windowtitle="Lab2"
+                doctitle="InClass"
+                bottom="Copyright 2018 Alec Shinn" />
+    </target>
+
+  <!-- Clean -->
+  <target name="clean">
+    <delete file="${dist.jar}"/>
+    <delete dir="${tomcat.dir}-${tomcat-port1}/webapps/${app.name}"/>
+    <delete dir="${webapps.dir1}\ROOT"/>
+	<delete dir="${webapps.dir1}\lab1task2"/>
+    <delete file="${tomcat.dir}-${tomcat-port1}/webapps/${dist.jar1}"/>
+    <delete file="${tomcat.dir}-${tomcat.port2}/webapps/${dist.jar2}"/>
+	<delete file="${tomcat.dir}-${tomcat-port1}/webapps/${dist.jar1}"/>
+    <delete file="${tomcat.dir}-${tomcat.port2}/webapps/${dist.jar2}"/>
+    <delete dir="${build.home}"/>
+    <delete dir="${classes.dir}"/>
+  </target>
+
+  <!-- Clean all -->
+  <target name="cleanall" depends="clean">
+    <delete dir="${javadoc.dir}"/>
+    <delete file="${submit.jar}"/>
+  </target>
+
+</project>
