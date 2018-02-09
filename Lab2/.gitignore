@@ -1,1 +1,8 @@
-/bin/
+!build.xml
+!build.properties
+!*.java
+!*.html
+!*.css
+!*.jsp
+!*.xml
+!*.jar
